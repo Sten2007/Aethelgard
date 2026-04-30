@@ -1,0 +1,298 @@
+:root {
+    --glass-bg: #000;
+    --glass-border: #fff;
+    --text-color: #ffffff;
+    --accent-color: #fef08a;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+    font-family: 'Press Start 2P', monospace, sans-serif;
+    color: var(--text-color);
+}
+
+#app {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+#game-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    border: 4px solid var(--glass-border);
+    border-radius: 0px; /* Retro means no blurred, no rounded corners */
+    padding: 20px;
+    box-shadow: inset 0 0 0 2px #aaa;
+    pointer-events: auto;
+}
+
+.hud {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 250px;
+}
+
+.stat-bar {
+    height: 18px; /* Slightly taller for text */
+    background: rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 0px;
+    overflow: hidden;
+    margin: 8px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-label {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 0.5rem;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.stat-fill {
+    height: 100%;
+    width: 100%;
+    transition: width 0.3s ease-out;
+}
+
+.hp-fill { background: linear-gradient(90deg, #ef4444, #f87171); }
+.mp-fill { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+
+.battle-menu {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+}
+
+.battle-btn {
+    padding: 12px 24px;
+    background: var(--glass-bg);
+    border: 4px solid var(--glass-border);
+    color: white;
+    border-radius: 0px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    transition: none;
+}
+
+.battle-btn:hover {
+    background: #fff;
+    color: #000;
+}
+
+.battle-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    border-color: #555;
+    color: #555;
+}
+
+/* --- BOOK UI STYLES --- */
+.book-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    perspective: 2000px;
+    animation: fadeIn 0.3s ease-out;
+    padding-top: 60px;
+    box-sizing: border-box;
+}
+
+.book {
+    position: relative;
+    width: 1100px;
+    height: 750px;
+    transform-style: preserve-3d;
+    display: flex;
+    justify-content: center; /* Center the open book */
+    margin: 0 auto;
+}
+
+/* Spine shadow */
+.book::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 5%;
+    height: 90%;
+    width: 2px;
+    background: rgba(0,0,0,0.2);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.book-page {
+    position: absolute;
+    width: 550px;
+    height: 100%;
+    top: 0;
+    right: 0;
+    transform-origin: left center;
+    transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transform-style: preserve-3d;
+}
+
+.page-side {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    padding: 40px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+}
+
+/* Hide scrollbar for covers */
+.cover-front .page-side, .cover-back .page-side {
+    overflow: hidden;
+}
+
+.page-front {
+    background: #fdf6e3;
+    color: #2d3436;
+    border-radius: 0 10px 10px 0;
+    z-index: 2;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-left: none;
+}
+
+.page-back {
+    background: #fdf6e3;
+    color: #2d3436;
+    transform: rotateY(180deg);
+    border-radius: 10px 0 0 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-right: none;
+}
+
+/* Page flipped state */
+.book-page.flipped {
+    transform: rotateY(-180deg);
+}
+
+/* Leather Cover Style */
+.book-page.cover-front .page-front {
+    background: #3d2b1f; /* Dark leather */
+    color: #d4af37; /* Gold text */
+    border: 8px double #1a1a1a;
+}
+
+.book-page.cover-back .page-back {
+    background: #3d2b1f;
+    border: 8px double #1a1a1a;
+}
+
+.book-page.flipped {
+    transform: rotateY(-180deg);
+}
+
+/* Paper Texture Effect */
+.page-side::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(circle at 50% 50%, transparent 95%, rgba(0,0,0,0.05) 100%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    pointer-events: none;
+}
+
+.book-nav {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    z-index: 1001;
+}
+
+.book-btn {
+    background: rgba(255,255,255,0.1);
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 12px 24px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    backdrop-filter: blur(4px);
+}
+
+.book-btn:hover:not(:disabled) {
+    background: #fff;
+    color: #000;
+    transform: translateY(-2px);
+}
+
+.book-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.close-book {
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 10px 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.5);
+    margin-top: 12px;
+    z-index: 1001;
+}
+
+.close-book:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+}
+
+/* Typography for Book */
+.book h2 { font-size: 1.2rem; margin-bottom: 20px; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 10px; }
+.book h3 { font-size: 0.8rem; color: #b45309; margin-top: 25px; }
+.book p, .book li { font-size: 0.65rem; line-height: 1.8; margin-bottom: 12px; }
+.book ul { padding-left: 20px; }
+.book table { width: 100%; border-collapse: collapse; font-size: 0.6rem; margin-top: 10px; }
+.book th { text-align: left; border-bottom: 1px solid #ccc; padding: 5px; color: #666; }
+.book td { padding: 5px; border-bottom: 1px solid #eee; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
