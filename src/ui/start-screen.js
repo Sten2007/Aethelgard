@@ -51,11 +51,18 @@ export class StartScreen {
                 .tab-btn { font-size: 0.7rem; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #e2e8f0; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
                 .tab-btn:hover, .tab-btn.active { background: rgba(99,102,241,0.3); border-color: #6366f1; }
                 .stars { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+                .update-counter { position: fixed; right: 40px; top: 50%; transform: translateY(-50%); text-align: right; font-family: 'Press Start 2P', monospace; z-index: 10; pointer-events: none; }
             </style>
 
             <svg class="stars" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
                 ${Array.from({length:60}).map(() => `<circle cx="${Math.random()*800}" cy="${Math.random()*600}" r="${Math.random()*1.5+0.5}" fill="white" opacity="${Math.random()*0.6+0.2}"/>`).join('')}
             </svg>
+
+            <div class="update-counter glass-panel" style="padding: 20px; border-color: rgba(99,102,241,0.5);">
+                <p style="font-size: 0.6rem; color: #94a3b8; margin-bottom: 15px; letter-spacing: 2px;">MAJOR UPDATE IN</p>
+                <div id="countdown-timer" style="font-size: 1.2rem; color: #6366f1; text-shadow: 0 0 10px rgba(99,102,241,0.5);">--:--:--:--</div>
+                <p style="font-size: 0.5rem; color: #475569; margin-top: 15px;">COMING MONDAY</p>
+            </div>
 
             <div class="start-screen" style="position:relative; z-index:1;">
                 <h1 class="title-glow">AETHELGARD</h1>
@@ -138,6 +145,37 @@ export class StartScreen {
                 }
             };
         }
+
+        this.startCountdown();
+    }
+
+    startCountdown() {
+        const updateTimer = () => {
+            const now = new Date();
+            // Find next Monday at 00:00:00
+            const nextMonday = new Date(now);
+            nextMonday.setDate(now.getDate() + (1 + 7 - now.getDay()) % 7);
+            if (now.getDay() === 1 && now.getHours() >= 0) {
+                // If it's already monday, target the NEXT one (simplified logic)
+                nextMonday.setDate(nextMonday.getDate() + 7);
+            }
+            nextMonday.setHours(0, 0, 0, 0);
+
+            const diff = nextMonday - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const mins = Math.floor((diff / 1000 / 60) % 60);
+            const secs = Math.floor((diff / 1000) % 60);
+
+            const timerEl = document.getElementById('countdown-timer');
+            if (timerEl) {
+                timerEl.innerText = `${days}d ${hours}h ${mins}m ${secs}s`;
+            }
+        };
+
+        updateTimer();
+        this.countdownInterval = setInterval(updateTimer, 1000);
     }
 
     renderCharacterSelect() {

@@ -163,7 +163,6 @@ export class Game {
             this.uiLayer.innerHTML = `
                 <div class="hud glass-panel">
                     <button id="mute-btn" style="position:absolute; top: 10px; right: 10px; background:none; border:none; color:white; cursor:pointer; font-size:1.2rem;">${this.audio.isMuted ? '🔇' : '🔊'}</button>
-                    <div style="position:absolute; top: 10px; right: 40px; font-size: 0.6rem; color: #94a3b8; font-family: monospace;">Next Update: Monday</div>
                     <h3>Hero (Lvl ${h.level})</h3>
                     <p style="margin: 4px 0; font-size: 0.8em; color: #fbbf24;">Gold: ${h.gold} | World: ${h.worldId}</p>
                     <div class="stat-bar"><div class="stat-fill hp-fill" style="width:${(h.hp/h.maxHp)*100}%"></div></div>
