@@ -2,7 +2,7 @@
 
 A browser-based pixel-art RPG built with vanilla JavaScript and Vite.
 
-🎮 **[Play the game here](https://sten2007.github.io/Aethelgard/)**
+🎮 **[Play the game here](https://Sten2007.github.io/Aethelgard/)**
 
 ---
 
