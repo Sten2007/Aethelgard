@@ -12,7 +12,7 @@ export class Game {
         this.uiLayer = uiLayer;
         
         this.state = 'MENU'; // MENU, WORLD, BATTLE, SHOP
-        this.player = new Player(39, 40, charClass); 
+        this.player = new Player(10, 10, charClass); 
         this.map = new TileMap(this.player.stats.worldId || 1);
         this.combat = new CombatSystem(this.player, this.uiLayer);
         this.shop = new ShopSystem(this.player, this.uiLayer);

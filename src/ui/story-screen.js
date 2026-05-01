@@ -18,7 +18,7 @@ export class StoryScreen {
     render() {
         this.container.innerHTML = `
             <div id="story-screen" style="position:absolute;inset:0;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity 1s ease;pointer-events:auto;">
-                <img id="story-bg" src="/intro_bg.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 3s ease;image-rendering:pixelated;" />
+                <img id="story-bg" src="intro_bg.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 3s ease;image-rendering:pixelated;" />
                 
                 <div id="start-overlay" style="position:absolute;inset:0;background:#000;display:flex;justify-content:center;align-items:center;z-index:10000;transition:opacity 1s ease;cursor:pointer;">
                     <p style="color:#fff;font-size:1.5rem;animation: pulse 2s infinite;">Click to Enter Aethelgard</p>
@@ -52,7 +52,7 @@ export class StoryScreen {
         // Fade in background image
         const bg = document.getElementById('story-bg');
         if (bg) {
-            bg.src = '/intro_peace.png';
+            bg.src = 'intro_peace.png';
             bg.style.opacity = '0.5';
         }
 
@@ -84,7 +84,7 @@ export class StoryScreen {
             this.textEl.style.opacity = '1';
             
             if (bg) {
-                if (this.currentLine === 1) bg.src = '/intro_bg.png';
+                if (this.currentLine === 1) bg.src = 'intro_bg.png';
                 bg.style.opacity = '0.5';
             }
             
