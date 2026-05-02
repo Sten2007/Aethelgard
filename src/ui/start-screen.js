@@ -61,7 +61,7 @@ export class StartScreen {
             <div class="update-counter glass-panel" style="padding: 20px; border-color: rgba(99,102,241,0.5);">
                 <p style="font-size: 0.6rem; color: #94a3b8; margin-bottom: 15px; letter-spacing: 2px;">MAJOR UPDATE IN</p>
                 <div id="countdown-timer" style="font-size: 1.2rem; color: #6366f1; text-shadow: 0 0 10px rgba(99,102,241,0.5);">--:--:--:--</div>
-                <p style="font-size: 0.5rem; color: #475569; margin-top: 15px;">COMING MONDAY</p>
+                <p style="font-size: 0.5rem; color: #475569; margin-top: 15px;">COMING ON THE 6TH</p>
             </div>
 
             <div class="start-screen" style="position:relative; z-index:1;">
@@ -152,16 +152,14 @@ export class StartScreen {
     startCountdown() {
         const updateTimer = () => {
             const now = new Date();
-            // Find next Monday at 00:00:00
-            const nextMonday = new Date(now);
-            nextMonday.setDate(now.getDate() + (1 + 7 - now.getDay()) % 7);
-            if (now.getDay() === 1 && now.getHours() >= 0) {
-                // If it's already monday, target the NEXT one (simplified logic)
-                nextMonday.setDate(nextMonday.getDate() + 7);
+            // Target the 6th of the current month
+            const targetDate = new Date(now.getFullYear(), now.getMonth(), 6, 0, 0, 0, 0);
+            if (now > targetDate) {
+                // If it's already past the 6th, target the 6th of next month
+                targetDate.setMonth(targetDate.getMonth() + 1);
             }
-            nextMonday.setHours(0, 0, 0, 0);
 
-            const diff = nextMonday - now;
+            const diff = targetDate - now;
             
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
