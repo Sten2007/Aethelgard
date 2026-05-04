@@ -171,96 +171,185 @@ export class Player {
         let drawX, drawY;
         
         if (state === 'BATTLE') {
-            drawX = window.innerWidth * 0.25;
-            drawY = window.innerHeight * 0.5;
+            drawX = window.innerWidth * 0.25 - 32;
+            drawY = window.innerHeight * 0.5 - 32;
         } else {
-            // Screen center is window.innerWidth / 2, window.innerHeight / 2
-            // We want to draw our 64x64 player centered there.
             drawX = window.innerWidth / 2 - 32;
             drawY = window.innerHeight / 2 - 32;
         }
 
         ctx.save();
         ctx.translate(drawX, drawY);
+
+        // Bobbing animation for walking
+        const isMoving = Math.abs(this.x - this.realX) > 0.01 || Math.abs(this.y - this.realY) > 0.01;
+        const time = Date.now();
+        const bob = isMoving ? Math.round(Math.sin(time / 100) * 2) * 2 : 0;
         
-        // Character Body (Pixel Art Hero)
-        ctx.fillStyle = '#6366f1'; // Indigo tunic
-        ctx.fillRect(16, 20, 32, 28);
+        // Shadow stays on the floor
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.fillRect(16, 56, 32, 8); 
         
-        // Head / Skin
-        ctx.fillStyle = '#fcd34d'; // Skin tone
-        ctx.fillRect(18, 6, 28, 20);
+        ctx.translate(0, bob);
+
+        const colors = {
+            'K': '#0f172a', // Outline
+            'S': '#fcd34d', // Skin
+            's': '#d97706', // Skin shadow
+            'T': '#4f46e5', // Tunic base
+            't': '#3730a3', // Tunic shadow
+            'L': '#451a03', // Leather/Belt
+            'C': '#fbbf24', // Gold/Buckle
+            'B': '#1e293b', // Pants
+            'W': '#ffffff', // White
+            'H': '#78350f', // Hair (Brown)
+            'h': '#451a03', // Hair dark
+            'A': '#94a3b8', // Armor main
+            'a': '#64748b', // Armor dark
+            'l': '#cbd5e0', // Armor light
+            'M': '#1e3a8a', // Mage dark
+            'm': '#3b82f6', // Mage light
+        };
+
+        const body = [
+            "                ",
+            "    KKKKKKKK    ",
+            "   KSSSSSSSSK   ",
+            "   KSWWSSWWSK   ",
+            "   KSKKSSKKSK   ",
+            "   KSSSSSSSSK   ",
+            "   KSSSSSSSSK   ",
+            "    KKKKKKKK    ",
+            "   KTTTTTTTTK   ",
+            "  KTTTTTTTTTTK  ",
+            "  KTTTTTTTTTTK  ",
+            "  KLLLLLLLLLLK  ",
+            "  KLLLLCCLLLLK  ",
+            "   KttttttttK   ",
+            "   KBBBKKBBBK   ",
+            "   KKKK  KKKK   "
+        ];
+
+        const hair = {
+            'knight': [
+                "    KKKKKKKK    ",
+                "   KAAAAAAAAK   ",
+                "  KAllllaaaaaK  ",
+                "  KAAKAAKAAKaa  ",
+                "  KAAKAAKAAKaa  ",
+                "   KKKKKKKKKK   "
+            ],
+            'paladin': [
+                "      KKKK      ",
+                "     KCCCCK     ",
+                "    KAAAAAAAAK  ",
+                "   KAllllaaaaaK ",
+                "   KAAKAAKAAKaa ",
+                "   KAAKAAKAAKaa ",
+                "    KKKKKKKKKK  "
+            ],
+            'mage': [
+                "      KKK       ",
+                "     KMMMKK     ",
+                "    KMMmMMMK    ",
+                "   KMMMMMMMMK   ",
+                "  KCCCCCCCCCCK  ",
+                " KKKKKKKKKKKKKK "
+            ],
+            'rogue': [
+                "    KKKKKKKK    ",
+                "   KHHHHHHHHK   ",
+                "  KHHHHHHHHHhK  ",
+                "  KHH      HhK  ",
+                "  KHH      HhK  ",
+                "   K        K   "
+            ],
+            'berserker': [
+                "    KKKKKKKK    ",
+                "   KHHHHHHHHK   ",
+                "  KHHHHHHHHHhK  ",
+                "  KHHH    HHhK  ",
+                "   KHH    HhK   ",
+                "   K        K   "
+            ]
+        };
+
+        const drawSprite = (sprite) => {
+            const size = 4;
+            for (let y = 0; y < sprite.length; y++) {
+                if (!sprite[y]) continue;
+                for (let x = 0; x < sprite[y].length; x++) {
+                    const char = sprite[y][x];
+                    if (char !== ' ') {
+                        ctx.fillStyle = colors[char] || '#ff00ff';
+                        ctx.fillRect(x * size, y * size, size, size);
+                    }
+                }
+            }
+        };
+
+        // Draw character body
+        drawSprite(body);
         
-        // Eyes
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(24, 14, 4, 4); // Left eye
-        ctx.fillRect(36, 14, 4, 4); // Right eye
-        
-        // Hair / Helmet
-        ctx.fillStyle = '#1e293b'; 
-        ctx.fillRect(16, 4, 32, 6);
-        ctx.fillRect(14, 8, 4, 10);
-        ctx.fillRect(46, 8, 4, 10);
-        
-        // Legs
-        ctx.fillStyle = '#334155';
-        ctx.fillRect(20, 48, 8, 10); // Left leg
-        ctx.fillRect(36, 48, 8, 10); // Right leg
-        
-        // Weapon
-        if (this.stats.charClass === 'knight') {
+        // Draw hair/helmet
+        const classHair = hair[this.stats.charClass] || hair['knight'];
+        drawSprite(classHair);
+
+        // Helper for weapons (1 unit = 4px)
+        const drawPx = (x, y, w, h, colorKey) => {
+            ctx.fillStyle = colors[colorKey] || colorKey;
+            ctx.fillRect(x * 4, y * 4, w * 4, h * 4);
+        };
+
+        // Weapons overlay
+        const c = this.stats.charClass;
+        if (c === 'knight') {
             // Sword
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(48, 16, 4, 24); // Blade
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillRect(44, 40, 12, 4); // Hilt crossguard
-            ctx.fillStyle = '#451a03';
-            ctx.fillRect(48, 44, 4, 8); // Handle
+            drawPx(12, 3, 4, 9, 'K'); 
+            drawPx(13, 4, 2, 6, 'l'); 
+            drawPx(12, 10, 4, 2, 'K'); 
+            drawPx(13, 10, 2, 1, 'C'); 
+            drawPx(13, 11, 2, 1, 'L'); 
             
             // Shield
-            ctx.fillStyle = '#475569';
-            ctx.fillRect(4, 24, 12, 20);
-            ctx.fillStyle = '#cbd5e0';
-            ctx.fillRect(6, 26, 8, 16);
-        } else if (this.stats.charClass === 'berserker') {
+            drawPx(1, 7, 5, 6, 'K'); 
+            drawPx(2, 8, 3, 4, 'A'); 
+            drawPx(3, 8, 1, 4, 'l'); 
+        } else if (c === 'berserker') {
             // Big Axe
-            ctx.fillStyle = '#451a03';
-            ctx.fillRect(48, 12, 4, 36); // Handle
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(38, 12, 24, 16); // Axe head
-            ctx.fillStyle = '#cbd5e0';
-            ctx.fillRect(54, 12, 8, 16); // Blade edge
-        } else if (this.stats.charClass === 'rogue') {
-            // Dual Daggers
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(48, 24, 4, 12); // Right dagger
-            ctx.fillStyle = '#451a03';
-            ctx.fillRect(46, 36, 8, 2);
-            ctx.fillRect(48, 38, 4, 4);
+            drawPx(12, 2, 4, 12, 'K'); 
+            drawPx(13, 3, 2, 10, 'L'); 
             
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(0, 24, 4, 12); // Left dagger
-            ctx.fillStyle = '#451a03';
-            ctx.fillRect(-2, 36, 8, 2);
-            ctx.fillRect(0, 38, 4, 4);
-        } else if (this.stats.charClass === 'mage') {
+            drawPx(8, 2, 7, 6, 'K'); 
+            drawPx(9, 3, 5, 4, 'a'); 
+            drawPx(13, 3, 1, 4, 'l'); 
+        } else if (c === 'rogue') {
+            // Daggers
+            drawPx(13, 7, 3, 5, 'K'); 
+            drawPx(14, 8, 1, 2, 'l'); 
+            drawPx(14, 10, 1, 1, 'L'); 
+
+            drawPx(0, 7, 3, 5, 'K'); 
+            drawPx(1, 8, 1, 2, 'l'); 
+            drawPx(1, 10, 1, 1, 'L'); 
+        } else if (c === 'mage') {
             // Staff
-            ctx.fillStyle = '#78350f';
-            ctx.fillRect(48, 8, 4, 40); // Wooden staff
-            ctx.fillStyle = '#3b82f6';
-            ctx.fillRect(44, 4, 12, 12); // Crystal
-            ctx.fillStyle = '#93c5fd';
-            ctx.fillRect(46, 6, 8, 8); // Crystal core
-        } else if (this.stats.charClass === 'paladin') {
-            // Big Hammer
-            ctx.fillStyle = '#451a03';
-            ctx.fillRect(48, 20, 4, 28); // Handle
-            ctx.fillStyle = '#94a3b8';
-            ctx.fillRect(40, 8, 20, 12); // Hammer head
-            ctx.fillStyle = '#fbbf24';
-            ctx.fillRect(42, 10, 16, 8); // Gold trim
+            drawPx(12, 1, 4, 13, 'K'); 
+            drawPx(13, 2, 2, 11, 'L'); 
+            
+            drawPx(11, 0, 6, 5, 'K'); 
+            drawPx(12, 1, 4, 3, 'm'); 
+            drawPx(13, 2, 2, 1, '#ffffff'); 
+        } else if (c === 'paladin') {
+            // Hammer
+            drawPx(12, 3, 4, 10, 'K'); 
+            drawPx(13, 4, 2, 8, 'L'); 
+            
+            drawPx(8, 2, 9, 5, 'K'); 
+            drawPx(9, 3, 7, 3, 'A'); 
+            drawPx(9, 4, 7, 1, 'C'); 
         }
-        
+
         ctx.restore();
     }
 }
