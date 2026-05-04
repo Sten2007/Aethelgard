@@ -19,7 +19,15 @@ export class Player {
             dragonDefeated: false,
             kills: 0,
             timePlayed: 0,
-            armor: null
+            armor: null,
+            weapon: null,
+            skillPoints: 0,
+            masteries: {
+                guardian: 0, // Defense & Effect Chance
+                arcane: 0,   // Spell Dmg & Duration
+                slayer: 0    // Atk & Crit
+            },
+            discoveredWeapons: [] // Track unique finds
         };
         
         if (this.stats.charClass === 'berserker') {
@@ -41,9 +49,24 @@ export class Player {
         
         this.load();
         
+        // Ensure numeric fields are valid after load
+        this.stats.gold = Math.max(0, Math.floor(Number(this.stats.gold || 0)));
+        this.stats.skillPoints = Math.max(0, Math.floor(Number(this.stats.skillPoints || 0)));
+        
         // Sync real coords with potentially loaded layout coords
         this.realX = this.x;
         this.realY = this.y;
+    }
+
+    addGold(amount) {
+        const val = Math.floor(Number(amount) || 0);
+        if (val === 0) return;
+        this.stats.gold += val;
+        if (this.stats.gold < 0) this.stats.gold = 0;
+    }
+
+    addSkillPoint(amount = 1) {
+        this.stats.skillPoints += amount;
     }
 
     save() {
@@ -63,8 +86,13 @@ export class Player {
                 this.x = data.x;
                 this.y = data.y;
                 this.stats = {
-                    ...this.stats, // ensure new fields like kills/timePlayed default safely
-                    ...data.stats
+                    ...this.stats,
+                    ...data.stats,
+                    // Ensure nested objects are also merged safely
+                    masteries: {
+                        ...this.stats.masteries,
+                        ...(data.stats ? data.stats.masteries : {})
+                    }
                 };
             } catch (e) {
                 console.error("Save state corrupted", e);
@@ -94,7 +122,8 @@ export class Player {
         this.stats.mp = this.stats.maxMp;
         this.stats.atk += 2;
         this.stats.def += 1;
-        if (messagesOut) messagesOut.push(`Level Up! Reached level ${this.stats.level}!`);
+        this.addSkillPoint(1);
+        if (messagesOut) messagesOut.push(`Level Up! Reached level ${this.stats.level}! +1 Skill Point!`);
     }
 
     update(keys, map, deltaTime) {
@@ -109,13 +138,15 @@ export class Player {
             let nextX = this.x;
             let nextY = this.y;
 
-            if (keys['KeyW']) nextY--;
-            else if (keys['KeyS']) nextY++;
-            else if (keys['KeyA']) nextX--;
-            else if (keys['KeyD']) nextX++;
+            if (keys['KeyW'] || keys['KeyZ'] || keys['ArrowUp']) nextY--;
+            else if (keys['KeyS'] || keys['ArrowDown']) nextY++;
+            else if (keys['KeyA'] || keys['KeyQ'] || keys['ArrowLeft']) nextX--;
+            else if (keys['KeyD'] || keys['ArrowRight']) nextX++;
 
             if (nextX !== this.x || nextY !== this.y) {
                 if (map.isWalkable(nextX, nextY)) {
+                    this.lastX = this.x;
+                    this.lastY = this.y;
                     this.x = nextX;
                     this.y = nextY;
                     this.moved = true;
@@ -123,6 +154,17 @@ export class Player {
                 }
             }
         }
+    }
+
+    revertMove() {
+        if (this.lastX !== undefined && this.lastY !== undefined) {
+            this.x = this.lastX;
+            this.y = this.lastY;
+        } else {
+            this.x -= 1;
+        }
+        this.realX = this.x;
+        this.realY = this.y;
     }
 
     render(ctx, state) {
