@@ -22,6 +22,12 @@ window.addEventListener('load', () => {
         startScreen.render();
     };
 
-    const storyScreen = new StoryScreen(uiLayer, startGameScreen);
-    storyScreen.render();
+    const skipIntro = localStorage.getItem('aethelgard_skip_intro');
+    if (skipIntro === 'true') {
+        localStorage.removeItem('aethelgard_skip_intro');
+        startGameScreen();
+    } else {
+        const storyScreen = new StoryScreen(uiLayer, startGameScreen);
+        storyScreen.render();
+    }
 });

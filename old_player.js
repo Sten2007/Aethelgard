@@ -1,9 +1,9 @@
-export class Player {
+﻿export class Player {
     constructor(x, y, charClass) {
-        this.x = x; 
-        this.y = y; 
-        this.realX = this.x;
-        this.realY = this.y;
+        this.x = x; // Target X (tile)
+        this.y = y; // Target Y (tile)
+        this.realX = x; // Interpolated X
+        this.realY = y; // Interpolated Y
         this.size = 64;
         this.speed = 0.15;
         this.moved = false;
@@ -40,7 +40,7 @@ export class Player {
             this.stats.maxHp = 60; this.stats.hp = 60;
             this.stats.maxMp = 100; this.stats.mp = 100;
             this.stats.atk = 4; this.stats.def = 2;
-            this.stats.spells.push({ id: 'fireball', name: 'Fireball', mp: 8, dmg: 20 });
+            this.stats.spells.push({ id: 'fireball', name: 'Fireball', mp: 10, dmg: 20 });
         } else if (this.stats.charClass === 'paladin') {
             this.stats.maxHp = 150; this.stats.hp = 150;
             this.stats.maxMp = 30; this.stats.mp = 30;
@@ -48,13 +48,6 @@ export class Player {
         }
         
         this.load();
-
-        // Animation state for the Soldier (knight) sprite
-        this.animState = 'idle';   // 'idle' | 'walk' | 'attack' | 'hurt'
-        this.animStateTimer = 0;   // ms remaining for timed states
-        this.battleOffset = 0;     // Horizontal offset for battle animations (running off)
-        this.isEscaping = false;
-        Player.loadSprites();
         
         // Ensure numeric fields are valid after load
         this.stats.gold = Math.max(0, Math.floor(Number(this.stats.gold || 0)));
@@ -90,12 +83,21 @@ export class Player {
         if (saved) {
             try {
                 const data = JSON.parse(saved);
-                this.x = data.x; this.y = data.y;
-                this.stats = { ...this.stats, ...data.stats, masteries: { ...this.stats.masteries, ...(data.stats?.masteries || {}) } };
-            } catch (e) { console.error("Save state corrupted", e); }
-            return true;
+                this.x = data.x;
+                this.y = data.y;
+                this.stats = {
+                    ...this.stats,
+                    ...data.stats,
+                    // Ensure nested objects are also merged safely
+                    masteries: {
+                        ...this.stats.masteries,
+                        ...(data.stats ? data.stats.masteries : {})
+                    }
+                };
+            } catch (e) {
+                console.error("Save state corrupted", e);
+            }
         }
-        return false;
     }
 
     addExp(amount, messagesOut) {
@@ -124,26 +126,9 @@ export class Player {
         if (messagesOut) messagesOut.push(`Level Up! Reached level ${this.stats.level}! +1 Skill Point!`);
     }
 
-    updateAnimation(deltaTime) {
-        // Decay timed animation states
-        if (this.animStateTimer > 0) {
-            this.animStateTimer -= (deltaTime || 16);
-            if (this.animStateTimer <= 0) {
-                this.animState = 'idle';
-                this.animStateTimer = 0;
-            }
-        }
-
-        // Handle running off screen during escape
-        if (this.isEscaping) {
-            this.battleOffset -= 10; // Run left off screen
-        }
-    }
-
     update(keys, map, deltaTime) {
         this.moved = false;
-        this.updateAnimation(deltaTime);
-
+        
         // Smooth interpolation
         this.realX += (this.x - this.realX) * this.speed;
         this.realY += (this.y - this.realY) * this.speed;
@@ -182,113 +167,22 @@ export class Player {
         this.realY = this.y;
     }
 
-    /** Trigger a timed sprite animation (called from combat) */
-    setAnimState(state, durationMs = 600) {
-        this.animState = state;
-        this.animStateTimer = durationMs;
-    }
-
-    static soldierSprites = null;
-    static classSprites = {};
-
-    static loadSprites() {
-        if (this.soldierSprites) return;
-        
-        const loadImg = (src, makeTransparent = false) => {
-            if (!makeTransparent) {
-                const img = new Image();
-                img.src = src;
-                return img;
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = 0; // Use width=0 as a "not ready" flag
-            const img = new Image();
-            img.onload = () => {
-                if (!img.width) return;
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                try {
-                    const idata = ctx.getImageData(0, 0, img.width, img.height);
-                    const d = idata.data;
-                    for (let i = 0; i < d.length; i += 4) {
-                        if (d[i] > 240 && d[i+1] > 240 && d[i+2] > 240) d[i+3] = 0;
-                    }
-                    ctx.putImageData(idata, 0, 0);
-                } catch(e) {}
-            };
-            img.src = src;
-            return canvas;
-        };
-
-        this.soldierSprites = {
-            idle:   loadImg('soldier-idle.png'),
-            walk:   loadImg('soldier-walk.png'),
-            attack: loadImg('soldier-attack.png'),
-            hurt:   loadImg('soldier-hurt.png'),
-        };
-
-        const classes = ['berserker', 'rogue', 'mage', 'paladin'];
-        classes.forEach(c => {
-            if (c === 'mage') {
-                this.classSprites[c] = loadImg('mage_soldier_style.png', true);
-            } else {
-                this.classSprites[c] = loadImg(`${c}_idle.png`, true);
-            }
-        });
-    }
-
     render(ctx, state) {
         let drawX, drawY;
+        
         if (state === 'BATTLE') {
-            drawX = window.innerWidth * 0.25 - 32 + this.battleOffset;
-            drawY = window.innerHeight * 0.5 - 32;
+            drawX = window.innerWidth * 0.25;
+            drawY = window.innerHeight * 0.5;
         } else {
+            // Screen center is window.innerWidth / 2, window.innerHeight / 2
+            // We want to draw our 64x64 player centered there.
             drawX = window.innerWidth / 2 - 32;
             drawY = window.innerHeight / 2 - 32;
         }
 
         ctx.save();
         ctx.translate(drawX, drawY);
-
-        const isMoving = (state === 'BATTLE') ? this.isEscaping : (Math.abs(this.x - this.realX) > 0.01 || Math.abs(this.y - this.realY) > 0.01);
-        const bob = isMoving ? Math.round(Math.sin(Date.now() / 100) * 2) * 2 : 0;
-
-        // Shadow (Elegant Ellipse)
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-        ctx.beginPath();
-        ctx.ellipse(32, 48, 22, 7, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.translate(0, bob);
-
-        if (this.stats.charClass === 'knight') {
-            Player.loadSprites();
-            const sp = Player.soldierSprites;
-            if (sp) {
-                let sheet, frameCount, fps;
-                if (this.animState === 'attack' && this.animStateTimer > 0) {
-                    sheet = sp.attack; frameCount = 6; fps = 10;
-                } else if (this.animState === 'hurt' && this.animStateTimer > 0) {
-                    sheet = sp.hurt;   frameCount = 4; fps = 8;
-                } else if (isMoving) {
-                    sheet = sp.walk;   frameCount = 8; fps = 10;
-                } else {
-                    sheet = sp.idle;   frameCount = 6; fps = 6;
-                }
-                
-                if (sheet && sheet.width > 0 && (sheet instanceof HTMLCanvasElement || sheet.complete)) {
-                    const frame = Math.floor(Date.now() / (1000 / fps)) % frameCount;
-                    ctx.imageSmoothingEnabled = false;
-                    ctx.drawImage(sheet, frame * 100, 0, 100, 100, -136, -145, 340, 340);
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.restore();
-                    return; // Done rendering the knight
-                }
-            }
-        }
-
+        
         // Character Body (Pixel Art Hero)
         ctx.fillStyle = '#6366f1'; // Indigo tunic
         ctx.fillRect(16, 20, 32, 28);

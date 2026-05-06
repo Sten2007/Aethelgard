@@ -11,56 +11,56 @@ export class ShopSystem {
         this.active = true;
         if (worldId === 1) {
             this.spells = [
-                { id: 'fireball', name: 'Fireball', cost: 10, mp: 10, dmg: 25, type: 'magic' },
-                { id: 'heal', name: 'Heal', cost: 15, mp: 15, dmg: -20, type: 'magic' },
-                { id: 'slash', name: 'Power Slash', cost: 25, mp: 0, dmg: 35, type: 'physical' },
+                { id: 'fireball', name: 'Fireball', cost: 10, mp: 8, dmg: 22, type: 'magic' },
+                { id: 'heal', name: 'Heal', cost: 15, mp: 12, dmg: -25, type: 'magic' },
+                { id: 'slash', name: 'Power Slash', cost: 25, mp: 6, dmg: 32, type: 'physical' },
                 { id: 'ice_shard', name: 'Ice Shard', cost: 20, mp: 15, dmg: 35, type: 'magic' },
-                { id: 'vamp_touch', name: 'Vampiric Touch', cost: 40, mp: 20, dmg: 25, type: 'lifesteal' }
+                { id: 'vamp_touch', name: 'Vampiric Touch', cost: 40, mp: 18, dmg: 20, type: 'lifesteal' }
             ];
             this.armor = { id: 'leather_armor', name: 'Leather Armor', cost: 30, def: 5 };
         } else if (worldId === 2) {
             this.spells = [
-                { id: 'inferno', name: 'Inferno', cost: 50, mp: 30, dmg: 60, type: 'magic' },
-                { id: 'lightning', name: 'Lightning Strike', cost: 60, mp: 35, dmg: 75, type: 'magic' },
-                { id: 'g_heal', name: 'Greater Heal', cost: 70, mp: 25, dmg: -75, type: 'magic' },
-                { id: 'earthquake', name: 'Earthquake', cost: 80, mp: 45, dmg: 85, type: 'magic' },
-                { id: 'blood_strike', name: 'Blood Strike', cost: 100, mp: 35, dmg: 70, type: 'lifesteal' }
+                { id: 'inferno', name: 'Inferno', cost: 50, mp: 25, dmg: 55, type: 'magic' },
+                { id: 'lightning', name: 'Lightning Strike', cost: 60, mp: 30, dmg: 65, type: 'magic' },
+                { id: 'g_heal', name: 'Greater Heal', cost: 70, mp: 20, dmg: -90, type: 'magic' },
+                { id: 'earthquake', name: 'Earthquake', cost: 80, mp: 40, dmg: 80, type: 'magic' },
+                { id: 'blood_strike', name: 'Blood Strike', cost: 100, mp: 30, dmg: 60, type: 'lifesteal' }
             ];
             this.armor = { id: 'iron_armor', name: 'Iron Armor', cost: 100, def: 15 };
         } else if (worldId === 3) {
             this.spells = [
-                { id: 'meteor', name: 'Meteor Swarm', cost: 120, mp: 50, dmg: 150, type: 'magic' },
-                { id: 'holy', name: 'Holy Light', cost: 140, mp: 40, dmg: -120, type: 'magic' },
-                { id: 'crystal', name: 'Crystal Beam', cost: 200, mp: 60, dmg: 250, type: 'magic' },
-                { id: 'blizzard', name: 'Blizzard', cost: 180, mp: 65, dmg: 200, type: 'magic' },
-                { id: 'soul_siphon', name: 'Soul Siphon', cost: 250, mp: 70, dmg: 180, type: 'lifesteal' }
+                { id: 'meteor', name: 'Meteor Swarm', cost: 120, mp: 45, dmg: 150, type: 'magic' },
+                { id: 'holy', name: 'Holy Light', cost: 140, mp: 35, dmg: -150, type: 'magic' },
+                { id: 'crystal', name: 'Crystal Beam', cost: 200, mp: 55, dmg: 240, type: 'magic' },
+                { id: 'blizzard', name: 'Blizzard', cost: 180, mp: 60, dmg: 180, type: 'magic' },
+                { id: 'soul_siphon', name: 'Soul Siphon', cost: 250, mp: 65, dmg: 160, type: 'lifesteal' }
             ];
             this.armor = { id: 'steel_armor', name: 'Steel Armor', cost: 300, def: 30 };
         } else if (worldId === 4) {
             this.spells = [
-                { id: 'void_pulse', name: 'Void Pulse', cost: 400, mp: 80, dmg: 500, type: 'magic' },
-                { id: 'dark_pact', name: 'Dark Pact', cost: 450, mp: 100, dmg: 700, type: 'magic' },
-                { id: 'abyss_heal', name: 'Abyss Heal', cost: 500, mp: 60, dmg: -400, type: 'magic' },
-                { id: 'shadow_scythe', name: 'Shadow Scythe', cost: 450, mp: 90, dmg: 600, type: 'magic' },
-                { id: 'nether_drain', name: 'Nether Drain', cost: 550, mp: 110, dmg: 500, type: 'lifesteal' }
+                { id: 'void_pulse', name: 'Void Pulse', cost: 400, mp: 70, dmg: 450, type: 'magic' },
+                { id: 'dark_pact', name: 'Dark Pact', cost: 450, mp: 90, dmg: 650, type: 'magic' },
+                { id: 'abyss_heal', name: 'Abyss Heal', cost: 500, mp: 50, dmg: -500, type: 'magic' },
+                { id: 'shadow_scythe', name: 'Shadow Scythe', cost: 450, mp: 80, dmg: 520, type: 'magic' },
+                { id: 'nether_drain', name: 'Nether Drain', cost: 550, mp: 100, dmg: 480, type: 'lifesteal' }
             ];
             this.armor = { id: 'obsidian_armor', name: 'Obsidian Armor', cost: 800, def: 80 };
         } else if (worldId === 5) {
             this.spells = [
-                { id: 'god_ray', name: 'God Ray', cost: 1000, mp: 150, dmg: 1200, type: 'magic' },
-                { id: 'heavens_gate', name: "Heaven's Gate", cost: 1500, mp: 200, dmg: 2500, type: 'magic' },
-                { id: 'immortality', name: 'Divine Breath', cost: 2000, mp: 100, dmg: -2000, type: 'magic' },
-                { id: 'supernova', name: 'Supernova', cost: 1800, mp: 180, dmg: 2200, type: 'magic' },
-                { id: 'divine_siphon', name: 'Divine Siphon', cost: 2200, mp: 150, dmg: 1800, type: 'lifesteal' }
+                { id: 'god_ray', name: 'God Ray', cost: 1000, mp: 120, dmg: 1200, type: 'magic' },
+                { id: 'heavens_gate', name: "Heaven's Gate", cost: 1500, mp: 180, dmg: 2500, type: 'magic' },
+                { id: 'immortality', name: 'Divine Breath', cost: 2000, mp: 80, dmg: -2500, type: 'magic' },
+                { id: 'supernova', name: 'Supernova', cost: 1800, mp: 160, dmg: 2200, type: 'magic' },
+                { id: 'divine_siphon', name: 'Divine Siphon', cost: 2200, mp: 130, dmg: 1600, type: 'lifesteal' }
             ];
             this.armor = { id: 'divine_armor', name: 'Divine Armor', cost: 2000, def: 200 };
         } else if (worldId === 6) {
             this.spells = [
-                { id: 'void_crush', name: 'Void Crush', cost: 5000, mp: 300, dmg: 5000, type: 'magic' },
-                { id: 'oblivion', name: 'Oblivion', cost: 8000, mp: 500, dmg: 8000, type: 'magic' },
-                { id: 'eternity_heal', name: 'Eternity Heal', cost: 10000, mp: 400, dmg: -5000, type: 'magic' },
-                { id: 'reality_tear', name: 'Reality Tear', cost: 8000, mp: 400, dmg: 7000, type: 'magic' },
-                { id: 'eternity_drain', name: 'Eternity Drain', cost: 12000, mp: 500, dmg: 6000, type: 'lifesteal' }
+                { id: 'void_crush', name: 'Void Crush', cost: 5000, mp: 250, dmg: 5000, type: 'magic' },
+                { id: 'oblivion', name: 'Oblivion', cost: 8000, mp: 400, dmg: 8000, type: 'magic' },
+                { id: 'eternity_heal', name: 'Eternity Heal', cost: 10000, mp: 300, dmg: -7000, type: 'magic' },
+                { id: 'reality_tear', name: 'Reality Tear', cost: 8000, mp: 350, dmg: 7000, type: 'magic' },
+                { id: 'eternity_drain', name: 'Eternity Drain', cost: 12000, mp: 450, dmg: 6000, type: 'lifesteal' }
             ];
             this.armor = { id: 'eternity_armor', name: 'Eternity Armor', cost: 10000, def: 500 };
         }

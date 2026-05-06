@@ -1,124 +1,74 @@
-/**
- * showModal(message, onClose)
- * Renders a stylized fullscreen overlay modal centered on screen.
- * onClose is called when the user dismisses it.
- */
-export function showModal(message, onClose) {
-    // Remove any existing modal
-    const existing = document.getElementById('game-modal');
-    if (existing) existing.remove();
-
+export function showModal(content, onConfirm = null, title = "ANCIENT FIND", btnText = "CLAIM") {
     const overlay = document.createElement('div');
-    overlay.id = 'game-modal';
-    overlay.style.cssText = `
-        position: fixed; inset: 0;
+    overlay.style = `
+        position: fixed; inset: 0; background: rgba(0,0,0,0.85);
         display: flex; align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.75);
-        z-index: 9999;
-        font-family: 'Press Start 2P', monospace;
-        animation: fadeIn 0.2s ease;
+        z-index: 3000; animation: fadeIn 0.3s ease;
     `;
-
-    // Parse multi-line messages
-    const lines = message.split('\n').map(l => 
-        `<p style="margin: 6px 0; line-height: 1.8; font-size: ${l.startsWith('⭐') || l.startsWith('🏆') ? '0.85rem' : '0.72rem'};">${l}</p>`
-    ).join('');
-
+    
     overlay.innerHTML = `
-        <style>
-            @keyframes fadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
-            @keyframes pulse { 0%,100% { box-shadow: 0 0 30px rgba(99,102,241,0.4); } 50% { box-shadow: 0 0 60px rgba(99,102,241,0.8); } }
-        </style>
-        <div style="
-            background: linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(30,41,59,0.98) 100%);
-            border: 2px solid rgba(99,102,241,0.5);
-            border-radius: 8px;
-            padding: 40px 48px;
-            max-width: 520px;
-            min-width: 300px;
-            text-align: center;
-            color: #e2e8f0;
-            animation: pulse 2s infinite;
-            position: relative;
-        ">
-            <div style="margin-bottom: 20px; min-height: 40px;">
-                ${lines}
+        <div class="parchment-panel" style="animation: scrollOpen 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;">
+            <div class="wax-seal" style="position: absolute; top: -20px; right: -20px; width: 45px; height: 45px; background: #991b1b; border-radius: 50%; border: 3px solid #7f1d1d; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 10;"></div>
+            <div style="text-align: center; margin-bottom: 20px; font-family: var(--font-heading); font-size: 1.4rem; color: #78350f; border-bottom: 2px solid rgba(120,53,15,0.2); padding-bottom: 8px; letter-spacing: 2px;">
+                ${title}
             </div>
-            <button id="modal-ok-btn" style="
-                font-family: 'Press Start 2P', monospace;
-                font-size: 0.75rem;
-                padding: 12px 32px;
-                background: linear-gradient(135deg, #4f46e5, #7c3aed);
-                color: #fff;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                letter-spacing: 0.1em;
-                margin-top: 10px;
-                transition: transform 0.1s, brightness 0.1s;
-            " onmouseover="this.style.filter='brightness(1.2)'" onmouseout="this.style.filter='brightness(1)'">
-                OK
-            </button>
+            <div style="line-height: 1.6; margin-bottom: 25px; white-space: pre-wrap; font-size: 1.1rem; text-align: center;">${content}</div>
+            <div style="text-align: center;">
+                <button class="battle-btn modal-ok-btn" style="min-width: 160px; margin: 0 auto;">${btnText}</button>
+            </div>
         </div>
+        <style>
+            @keyframes scrollOpen {
+                from { transform: scaleY(0); opacity: 0; }
+                to { transform: scaleY(1); opacity: 1; }
+            }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        </style>
     `;
-
+    
     document.body.appendChild(overlay);
-
+    
     const close = () => {
-        overlay.remove();
-        if (onClose) onClose();
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 200);
+        if (onConfirm) onConfirm();
     };
-
-    document.getElementById('modal-ok-btn').onclick = close;
-    // Also close on backdrop click
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) close();
-    });
+    
+    overlay.querySelector('.modal-ok-btn').onclick = close;
+    overlay.onclick = (e) => { if(e.target === overlay) close(); };
 }
 
-/**
- * showConfirm(message, onConfirm, onCancel)
- * A Yes/No styled confirm dialog.
- */
-export function showConfirm(message, onConfirm, onCancel) {
-    const existing = document.getElementById('game-modal');
-    if (existing) existing.remove();
-
+export function showConfirm(content, onYes, onNo = null) {
     const overlay = document.createElement('div');
-    overlay.id = 'game-modal';
-    overlay.style.cssText = `
-        position: fixed; inset: 0;
+    overlay.style = `
+        position: fixed; inset: 0; background: rgba(0,0,0,0.85);
         display: flex; align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.75);
-        z-index: 9999;
-        font-family: 'Press Start 2P', monospace;
-        animation: fadeIn 0.2s ease;
+        z-index: 2000; animation: fadeIn 0.3s ease;
     `;
-
-    const lines = message.split('\n').map(l =>
-        `<p style="margin: 6px 0; line-height:1.8; font-size:0.72rem;">${l}</p>`
-    ).join('');
-
+    
     overlay.innerHTML = `
-        <style>@keyframes fadeIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }</style>
-        <div style="
-            background: linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(30,41,59,0.98) 100%);
-            border: 2px solid rgba(99,102,241,0.5);
-            border-radius: 8px;
-            padding: 40px 48px;
-            max-width: 480px;
-            text-align: center;
-            color: #e2e8f0;
-        ">
-            ${lines}
-            <div style="display:flex; gap:16px; justify-content:center; margin-top:24px;">
-                <button id="modal-yes" style="font-family:'Press Start 2P',monospace;font-size:0.7rem;padding:12px 28px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:4px;cursor:pointer;">YES</button>
-                <button id="modal-no" style="font-family:'Press Start 2P',monospace;font-size:0.7rem;padding:12px 28px;background:rgba(255,255,255,0.08);color:#e2e8f0;border:1px solid rgba(255,255,255,0.2);border-radius:4px;cursor:pointer;">NO</button>
+        <div class="parchment-panel" style="animation: scrollOpen 0.5s ease-out; position: relative;">
+            <div class="wax-seal" style="position: absolute; top: -25px; left: -25px; width: 50px; height: 50px; background: #1e3a8a; border-radius: 50%; border: 4px solid #172554; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>
+            <div style="text-align: center; margin-bottom: 30px; font-family: var(--font-heading); font-size: 1.8rem; border-bottom: 2px double rgba(49,46,129,0.2); padding-bottom: 10px;">
+                ROYAL DECREE
+            </div>
+            <div style="line-height: 1.8; margin-bottom: 40px; white-space: pre-wrap; font-size: 1.2rem;">${content}</div>
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <button id="modal-yes" class="battle-btn" style="min-width: 140px; background-color: #065f46;">YES</button>
+                <button id="modal-no" class="battle-btn" style="min-width: 140px; background-color: #991b1b;">NO</button>
             </div>
         </div>
+        <style>
+            @keyframes scrollOpen {
+                from { transform: scaleY(0); opacity: 0; }
+                to { transform: scaleY(1); opacity: 1; }
+            }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        </style>
     `;
-
+    
     document.body.appendChild(overlay);
-    document.getElementById('modal-yes').onclick = () => { overlay.remove(); if (onConfirm) onConfirm(); };
-    document.getElementById('modal-no').onclick  = () => { overlay.remove(); if (onCancel) onCancel(); };
+    
+    document.getElementById('modal-yes').onclick = () => { overlay.remove(); onYes(); };
+    document.getElementById('modal-no').onclick = () => { overlay.remove(); if(onNo) onNo(); };
 }

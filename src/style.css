@@ -1,9 +1,15 @@
 :root {
-    --glass-bg: #000;
-    --glass-border: #fff;
-    --text-color: #ffffff;
-    --accent-color: #fef08a;
+    --royal-bg: #0f172a;
+    --gold-accent: #fbbf24;
+    --gold-dim: #b45309;
+    --crimson: #991b1b;
+    --text-color: #f8fafc;
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-heading: 'MedievalSharp', serif;
+    --font-body: 'Almendra', serif;
 }
+
+* { box-sizing: border-box; }
 
 body, html {
     margin: 0;
@@ -11,164 +17,250 @@ body, html {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: #000;
-    font-family: 'Press Start 2P', monospace, sans-serif;
+    background: #020617;
+    font-family: var(--font-pixel);
     color: var(--text-color);
 }
 
-#app {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-}
-
-#game-canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-#ui-layer {
+/* --- Starry Void Background --- */
+body::before {
+    content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+    inset: 0;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 80px 120px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 150px 150px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 190px 50px, #fff, rgba(0,0,0,0));
+    background-size: 200px 200px;
+    opacity: 0.2;
+    z-index: -1;
 }
 
+/* --- Royal Tapestry Panel --- */
 .glass-panel {
-    background: var(--glass-bg);
-    border: 4px solid var(--glass-border);
-    border-radius: 0px; /* Retro means no blurred, no rounded corners */
-    padding: 20px;
-    box-shadow: inset 0 0 0 2px #aaa;
-    pointer-events: auto;
+    background: rgba(0,0,0,0.8);
+    border-left: 3px solid var(--gold-accent);
+    border-right: 3px solid var(--gold-accent);
+    padding: 30px 50px;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,0,1);
+    z-index: 1;
+    backdrop-filter: blur(4px);
 }
 
+/* Combat HUD & Action Menu */
 .hud {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 250px;
+    left: 40px;
+    top: 40px;
+    min-width: 380px;
+    z-index: 10;
 }
 
-.stat-bar {
-    height: 18px; /* Slightly taller for text */
-    background: rgba(0,0,0,0.3);
-    border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 0px;
-    overflow: hidden;
-    margin: 8px 0;
-    position: relative;
+.battle-menu {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 40px;
+    z-index: 10;
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 20px;
+}
+
+.enemy-hud {
+    position: absolute;
+    right: 40px;
+    top: 40px;
+    min-width: 380px;
+    z-index: 10;
+}
+
+.glass-panel::before, .glass-panel::after {
+    content: "";
+    position: absolute;
+    left: -15px;
+    right: -15px;
+    height: 50px;
+    background-image: url('./gold-border.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 0 8px var(--gold-accent));
+}
+
+.glass-panel::before { top: -35px; }
+.glass-panel::after { bottom: -35px; transform: rotate(180deg); }
+
+/* --- Parchment Scroll --- */
+.parchment-panel {
+    background: #fdf6e3;
+    background-image: radial-gradient(circle at 50% 50%, #fefce8 0%, #fef3c7 100%);
+    border: 8px solid #92400e;
+    padding: 30px 40px;
+    color: #451a03;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 60px rgba(180,83,9,0.1);
+    width: 90%;
+    max-width: 450px;
+    font-family: var(--font-body);
+    border-radius: 4px;
+}
+
+/* Decorative Side Banners */
+.side-banner {
+    width: 45px;
+    height: 220px;
+    background: var(--crimson);
+    border: 2px solid var(--gold-accent);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 0;
+    position: relative;
+}
+
+.banner-crown {
+    position: absolute;
+    top: -20px;
+    font-size: 1.5rem;
+}
+
+.torch {
+    margin-top: 80px;
+    width: 14px;
+    height: 45px;
+    background: #451a03;
+    position: relative;
+    border: 2px solid #000;
+}
+
+.fire {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 28px;
+    background: #fbbf24;
+    border-radius: 50% 50% 20% 20%;
+    box-shadow: 0 0 15px #ef4444;
+    animation: flicker 0.2s infinite alternate;
+}
+
+@keyframes flicker { from { height: 28px; } to { height: 34px; } }
+
+h1 { font-size: 4rem !important; margin-bottom: 0.2rem !important; }
+
+/* --- Leaderboard Panel --- */
+#leaderboard-panel {
+    width: 400px;
+    height: auto;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(0,0,0,0.95);
+}
+
+#leaderboard-panel.panel-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.subtitle { font-size: 1rem !important; margin-bottom: 2rem !important; }
+
+/* --- Status Bars --- */
+.stat-bar {
+    height: 34px;
+    background: #1e1b4b;
+    border: 2px solid var(--gold-accent);
+    margin: 12px 0;
+    position: relative;
+    overflow: hidden;
 }
 
 .stat-label {
     position: absolute;
-    width: 100%;
-    text-align: center;
-    font-size: 0.5rem;
-    color: white;
-    text-shadow: 1px 1px 2px black;
-    z-index: 2;
-    pointer-events: none;
-}
-
-.stat-fill {
-    height: 100%;
-    width: 100%;
-    transition: width 0.3s ease-out;
-}
-
-.hp-fill { background: linear-gradient(90deg, #ef4444, #f87171); }
-.mp-fill { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-
-.battle-menu {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
+    inset: 0;
     display: flex;
-    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-family: var(--font-pixel);
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 0px #000;
+    pointer-events: none;
+    z-index: 5;
 }
 
+.stat-fill { height: 100%; transition: width 0.6s ease-out; }
+.hp-fill { background: #ef4444; }
+.mp-fill { background: #3b82f6; }
+
+/* --- Compact Buttons --- */
 .battle-btn {
     padding: 12px 24px;
-    background: var(--glass-bg);
-    border: 4px solid var(--glass-border);
-    color: white;
-    border-radius: 0px;
+    background: #e2e8f0;
+    border: 3px solid #94a3b8;
+    color: #1e293b;
     cursor: pointer;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.7rem;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
     text-transform: uppercase;
-    transition: none;
+    box-shadow: 0 4px 0px #475569;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
-.battle-btn:hover {
-    background: #fff;
-    color: #000;
-}
+.battle-btn:hover { background: #f8fafc; transform: translateY(1px); box-shadow: 0 3px 0px #475569; }
+.battle-btn:active { transform: translateY(4px); box-shadow: none; }
 
-.battle-btn.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-    border-color: #555;
-    color: #555;
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* --- BOOK UI STYLES --- */
+/* --- Sage's Chronicle (Book) --- */
 .book-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0,0,0,0.9);
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
+    justify-content: center;
+    z-index: 9000;
+    animation: fadeIn 0.4s ease;
     perspective: 2000px;
-    animation: fadeIn 0.3s ease-out;
-    padding-top: 60px;
-    box-sizing: border-box;
 }
 
 .book {
+    width: 800px;
+    height: 600px;
     position: relative;
-    width: 1100px;
-    height: 750px;
     transform-style: preserve-3d;
-    display: flex;
-    justify-content: center; /* Center the open book */
-    margin: 0 auto;
-}
-
-/* Spine shadow */
-.book::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 5%;
-    height: 90%;
-    width: 2px;
-    background: rgba(0,0,0,0.2);
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    z-index: 10;
-    pointer-events: none;
+    transition: transform 0.5s;
 }
 
 .book-page {
     position: absolute;
-    width: 550px;
+    width: 400px;
     height: 100%;
     top: 0;
     right: 0;
-    transform-origin: left center;
-    transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transform-origin: left;
     transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    cursor: pointer;
+}
+
+.book-page.flipped {
+    transform: rotateY(-180deg);
 }
 
 .page-side {
@@ -179,120 +271,59 @@ body, html {
     left: 0;
     backface-visibility: hidden;
     padding: 40px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
-}
-
-/* Hide scrollbar for covers */
-.cover-front .page-side, .cover-back .page-side {
-    overflow: hidden;
-}
-
-.page-front {
     background: #fdf6e3;
-    color: #2d3436;
-    border-radius: 0 10px 10px 0;
-    z-index: 2;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-left: none;
+    border: 1px solid #d4af37;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+    overflow: hidden;
+    font-family: var(--font-body);
+    color: #2c1810;
 }
 
 .page-back {
-    background: #fdf6e3;
-    color: #2d3436;
     transform: rotateY(180deg);
-    border-radius: 10px 0 0 10px;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-right: none;
+    background: #f5eed7;
+    border-right: 4px solid rgba(0,0,0,0.1);
 }
 
-/* Page flipped state */
-.book-page.flipped {
-    transform: rotateY(-180deg);
-}
-
-/* Leather Cover Style */
-.book-page.cover-front .page-front {
-    background: #3d2b1f; /* Dark leather */
-    color: #d4af37; /* Gold text */
-    border: 8px double #1a1a1a;
-}
-
-.book-page.cover-back .page-back {
-    background: #3d2b1f;
-    border: 8px double #1a1a1a;
-}
-
-.book-page.flipped {
-    transform: rotateY(-180deg);
-}
-
-/* Paper Texture Effect */
-.page-side::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: 
-        radial-gradient(circle at 50% 50%, transparent 95%, rgba(0,0,0,0.05) 100%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.05;
-    pointer-events: none;
+.page-front {
+    border-left: 4px solid rgba(0,0,0,0.1);
 }
 
 .book-nav {
-    margin-top: 30px;
+    margin-top: 40px;
     display: flex;
-    gap: 20px;
-    z-index: 1001;
+    gap: 30px;
 }
 
 .book-btn {
-    background: rgba(255,255,255,0.1);
-    border: 2px solid #fff;
+    background: #d4af37;
+    border: none;
+    padding: 12px 25px;
     color: #fff;
-    padding: 12px 24px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.7rem;
+    font-family: var(--font-heading);
     cursor: pointer;
-    transition: all 0.2s;
-    backdrop-filter: blur(4px);
-}
-
-.book-btn:hover:not(:disabled) {
-    background: #fff;
-    color: #000;
-    transform: translateY(-2px);
+    font-weight: bold;
+    box-shadow: 0 4px 0 #b45309;
 }
 
 .book-btn:disabled {
-    opacity: 0.2;
-    cursor: not-allowed;
+    opacity: 0.3;
+    cursor: default;
 }
 
 .close-book {
+    position: absolute;
+    top: 30px;
+    right: 30px;
     color: #fff;
+    font-family: var(--font-heading);
     cursor: pointer;
-    font-size: 0.8rem;
-    padding: 10px 20px;
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(0,0,0,0.5);
-    margin-top: 12px;
-    z-index: 1001;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    z-index: 100;
+    transition: color 0.2s;
 }
 
 .close-book:hover {
-    background: #ef4444;
-    border-color: #ef4444;
+    color: #ef4444;
 }
-
-/* Typography for Book */
-.book h2 { font-size: 1.2rem; margin-bottom: 20px; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 10px; }
-.book h3 { font-size: 0.8rem; color: #b45309; margin-top: 25px; }
-.book p, .book li { font-size: 0.65rem; line-height: 1.8; margin-bottom: 12px; }
-.book ul { padding-left: 20px; }
-.book table { width: 100%; border-collapse: collapse; font-size: 0.6rem; margin-top: 10px; }
-.book th { text-align: left; border-bottom: 1px solid #ccc; padding: 5px; color: #666; }
-.book td { padding: 5px; border-bottom: 1px solid #eee; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
