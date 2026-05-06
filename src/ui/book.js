@@ -58,7 +58,7 @@ export class Book {
                     ${denizensTable(`
                         <tr><td>Slime</td><td style="text-align:center">30</td><td style="text-align:center">6</td><td style="text-align:right">Leather Armor</td></tr>
                         <tr><td>Skeleton</td><td style="text-align:center">60</td><td style="text-align:center">12</td><td style="text-align:right">Leather Armor</td></tr>
-                        <tr><td>Demon Knight</td><td style="text-align:center">140</td><td style="text-align:center">22</td><td style="text-align:right">Iron Armor</td></tr>`)}`,
+                        <tr><td>Orc Raider</td><td style="text-align:center">120</td><td style="text-align:center">18</td><td style="text-align:right">Iron Armor</td></tr>`)}`,
                 back: `
                     <h2 style="font-size:1.3rem;color:#ef4444;font-family:var(--font-heading);border-bottom:2px solid rgba(0,0,0,0.1);padding-bottom:5px;">WORLD II: PEAKS</h2>
                     <p style="font-size:0.9rem;line-height:1.5;margin:10px 0;">A realm of scorched earth and rivers of molten rock.</p>
